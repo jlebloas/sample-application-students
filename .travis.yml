@@ -5,6 +5,12 @@ jdk: oraclejdk8
 cache:
   directories:
   - "$HOME/.m2/repository"
+  - '$HOME/.sonar/cache'
+
+# Environment variables ($SONAR_TOKEN)
+env:
+  global:
+    - secure: "pYl1HgfrXP2Ewwm9yRky2Ni+WkBRnz34+R+nVJ9TPZoqyruX62Up5E/Asa2Fx3FiefMM3gOOoIZpWAiqR9GUeOdehZFZEa8S1BF/b6e8RNkEKWaJ2I9fuw9/ulQ983f1hn/Atkb6PyU2+P082BpTY7bY3UaGKYDTa8OEZD2ZB7ZWfOFyaVi22Tbb1a2WFy53S57vKVikvMLZ4iBMysoVpq5T+KMuejk4PH4B/VVMzbjAR+nyqGvrQXAzWPtdiC+rtChcp00sln4qgtXFPpp0sYWGWEvVISQdzQXwiCXC1cETgWDWohZxMJ+7ij+rsdeevbirEniYREMSsdPYwDi3/uDbUEJaFkvR5Di+N+xNeiS/Nui+tzEAEpAD8tVyaCsYaOb2UP4JLqIPTOkienoDWgE93PQ6Iv6lBEEuSJc/lFP0Xxqf4DhxXQ82d+/EAZPGpyRFUlRujqO26yIfquUYtmDzS9/JHdfi8K3WIuHCdncqQLj5KV1UTcZ0tboR/uayQ1U1z2tfyySvBRQajFy0P6XaDFE/YLPHSveO30488TwvNVuts/O0jewVnGtVdkZVun9VtslA3X9mVXIfCGCWggQIdzwynSCJPURPLdfW5pujeJUo80j39N7Rz3fb7Wj04GnlwhSb0vGbuDSqU5mPtWj84/wdYqBmnIUvBJKArlY="
 
 services:
   - docker
@@ -14,4 +20,10 @@ before_install:
   - docker pull takimatraining/devops-training-db
   - docker run -d -p 127.0.0.1:3306:3306 takimatraining/devops-training-db
 
-script: ./mvnw clean verify -B -V
+script:
+  - |
+    mvn clean verify sonar:sonar \
+    -Dsonar.projectKey=sample-application-students \
+    -Dsonar.organization=jlebloas-github \
+    -Dsonar.host.url=https://sonarcloud.io \
+    -Dsonar.login=$SONAR_TOKEN
