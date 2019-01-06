@@ -28,8 +28,6 @@ script:
     -Dsonar.organization=jlebloas-github \
     -Dsonar.host.url=https://sonarcloud.io \
     -Dsonar.login=$SONAR_TOKEN
-
-after_success:
   - docker login -u jlebloas -p $DOCKER_PASS
   - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH; fi`
   - export IMAGE_NAME=jlebloas/sample-application-students
