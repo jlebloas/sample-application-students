@@ -11,6 +11,7 @@ cache:
 env:
   global:
     - secure: "pYl1HgfrXP2Ewwm9yRky2Ni+WkBRnz34+R+nVJ9TPZoqyruX62Up5E/Asa2Fx3FiefMM3gOOoIZpWAiqR9GUeOdehZFZEa8S1BF/b6e8RNkEKWaJ2I9fuw9/ulQ983f1hn/Atkb6PyU2+P082BpTY7bY3UaGKYDTa8OEZD2ZB7ZWfOFyaVi22Tbb1a2WFy53S57vKVikvMLZ4iBMysoVpq5T+KMuejk4PH4B/VVMzbjAR+nyqGvrQXAzWPtdiC+rtChcp00sln4qgtXFPpp0sYWGWEvVISQdzQXwiCXC1cETgWDWohZxMJ+7ij+rsdeevbirEniYREMSsdPYwDi3/uDbUEJaFkvR5Di+N+xNeiS/Nui+tzEAEpAD8tVyaCsYaOb2UP4JLqIPTOkienoDWgE93PQ6Iv6lBEEuSJc/lFP0Xxqf4DhxXQ82d+/EAZPGpyRFUlRujqO26yIfquUYtmDzS9/JHdfi8K3WIuHCdncqQLj5KV1UTcZ0tboR/uayQ1U1z2tfyySvBRQajFy0P6XaDFE/YLPHSveO30488TwvNVuts/O0jewVnGtVdkZVun9VtslA3X9mVXIfCGCWggQIdzwynSCJPURPLdfW5pujeJUo80j39N7Rz3fb7Wj04GnlwhSb0vGbuDSqU5mPtWj84/wdYqBmnIUvBJKArlY="
+    - secure: "I0OKwC3p5aSC7lyA7wYCsCyAM4y8CZUvzs4eNnhRfHBuQyUBOVIShepOb5P1pfyqLieP1Vm63PpdhxH0HEeR8DnOhctA80TY+eRjWSMAyaosyJac5tuA5oBOkYIZpfntYWM28A3WbU1qBjGAZO+w7WibeO9wNAh9YahtqCQTFnWaFYWXEQrRLwdNQDTYnbL0so+tbMTJVTPPrCCk+TZPCqFghrmqwxkeB2NhoMIYeCCs0BHL5UCDw8SPEwW3XVdjDhRAf5QViJFtjsvt6F4UrTtzMPXxHXZMJKMF7lSGVhVovllfVUgpbuCwqHU2oLPA+v/qTWM2iWbo8suN0p0h4S0k5ALmLOds8bWou8L9QaQbXOOx4N9kn7SoxahUcUdpGqeOVIlzL/3MFpxs9OVoL+LvOKA8sZMWaDbwCr/HZQPSEEDycD+eej5ON/xQNj3jZUeCx8Dh/l32FPGZ/Tz+vKPadLeSNYYTEqoO6i/kEYy1w+CWiWvZN5ZZxtXJ6FI7WRr8pEqM4kXqHGtUMXuKEC6LR2YUhRO4+G3jukV7MOgoJ/MeuMWar9dR+35ZitQj05duQ0dZvsj3Z9ONGwy7qiT8hvrJn6phVpoHdEOk8H38PzVvrHxF9Q/W+/AwHjMokVSW/Hj0T+1RckASDCq7cM7aHfs5CrqRxRse6X+nHUY="
 
 services:
   - docker
@@ -27,3 +28,11 @@ script:
     -Dsonar.organization=jlebloas-github \
     -Dsonar.host.url=https://sonarcloud.io \
     -Dsonar.login=$SONAR_TOKEN
+
+after_success:
+  - docker login -u jlebloas -p $DOCKER_PASS
+  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH; fi`
+  - export IMAGE_NAME=jlebloas/sample-application-students
+  - docker build -t $IMAGE_NAME:$TRAVIS_COMMIT .
+  - docker tag $IMAGE_NAME:$TRAVIS_COMMIT $IMAGE_NAME:$TAG
+  - docker push $IMAGE_NAME:$TAG
